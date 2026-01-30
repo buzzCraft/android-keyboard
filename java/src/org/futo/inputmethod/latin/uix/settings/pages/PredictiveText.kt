@@ -107,6 +107,13 @@ val PredictiveTextMenu = UserSettingsMenu(
             default = {true}
         ),
 
+        userSettingToggleSharedPrefs(
+            title = R.string.incognito_mode,
+            subtitle = R.string.incognito_mode_summary,
+            key = Settings.PREF_KEY_INCOGNITO_MODE,
+            default = {false}
+        ),
+
         //if(!transformerLmEnabled) {
         userSettingToggleSharedPrefs(
             title = R.string.bigram_prediction,

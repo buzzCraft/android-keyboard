@@ -430,7 +430,7 @@ class JapaneseIME(val helper: IMEHelper) : IMEInterface {
             yenSignCharacter = ProtoConfig.Config.YenSignCharacter.YEN_SIGN
 
             historyLearningLevel = when {
-                settings.mInputAttributes.mNoLearning || !settings.isPersonalizationEnabled ->
+                settings.mInputAttributes.mNoLearning || !settings.isLearningEnabled ->
                     ProtoConfig.Config.HistoryLearningLevel.READ_ONLY
 
                 //BuildConfig.DEBUG ->
@@ -439,7 +439,7 @@ class JapaneseIME(val helper: IMEHelper) : IMEInterface {
                 else ->
                     ProtoConfig.Config.HistoryLearningLevel.DEFAULT_HISTORY
             }
-            incognitoMode = false
+            incognitoMode = settings.mIncognitoMode
             generalConfig = ProtoConfig.GeneralConfig.newBuilder().apply {
                 uploadUsageStats = false
             }.build()

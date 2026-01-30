@@ -115,6 +115,7 @@ import org.futo.inputmethod.latin.SuggestedWords.SuggestedWordInfo.KIND_EMOJI_SU
 import org.futo.inputmethod.latin.SuggestedWords.SuggestedWordInfo.KIND_TYPED
 import org.futo.inputmethod.latin.SuggestionBlacklist
 import org.futo.inputmethod.latin.common.Constants
+import org.futo.inputmethod.latin.settings.Settings
 import org.futo.inputmethod.latin.suggestions.SuggestionStripViewListener
 import org.futo.inputmethod.latin.uix.actions.FavoriteActions
 import org.futo.inputmethod.latin.uix.actions.MoreActionsAction
@@ -122,6 +123,7 @@ import org.futo.inputmethod.latin.uix.actions.PinnedActions
 import org.futo.inputmethod.latin.uix.actions.toActionList
 import org.futo.inputmethod.latin.uix.settings.useDataStore
 import org.futo.inputmethod.latin.uix.settings.useDataStoreValue
+import org.futo.inputmethod.latin.uix.settings.useSharedPrefsBool
 import org.futo.inputmethod.latin.uix.theme.ThemeOption
 import org.futo.inputmethod.latin.uix.theme.Typography
 import org.futo.inputmethod.latin.uix.theme.UixThemeWrapper
@@ -768,6 +770,33 @@ fun ActionSep(isExtra: Boolean = false) {
         .background(sepCol)) {}
 }
 
+@Composable
+private fun IncognitoIndicator() {
+    val background = LocalKeyboardScheme.current.keyboardContainer
+    val foreground = LocalKeyboardScheme.current.onKeyboardContainer
+    Surface(
+        color = background,
+        shape = CircleShape,
+        modifier = Modifier
+            .padding(horizontal = 6.dp)
+            .fillMaxHeight()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.incognito_mode),
+                color = foreground,
+                style = suggestionStylePrimary.copy(fontSize = 12.sp).withCustomFont(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionBar(
@@ -788,6 +817,7 @@ fun ActionBar(
     val context = LocalContext.current
 
     val oldActionBar = useDataStore(OldStyleActionsBar)
+    val incognitoMode = useSharedPrefsBool(Settings.PREF_KEY_INCOGNITO_MODE, false).value
 
     val useDoubleHeight = isActionsExpanded && oldActionBar.value == false
 
@@ -836,47 +866,54 @@ fun ActionBar(
                     )
                 }
 
-                if(oldActionBar.value && isActionsExpanded) {
-                    Box(modifier = Modifier
+                Row(
+                    modifier = Modifier
                         .weight(1.0f)
-                        .fillMaxHeight()) {
+                        .fillMaxHeight(),
+                    verticalAlignment = CenterVertically
+                ) {
+                    if(oldActionBar.value && isActionsExpanded) {
                         ActionItems(onActionActivated, onActionAltActivated)
-                    }
-                } else {
-                    if (importantNotice != null) {
-                        ImportantNoticeView(importantNotice)
                     } else {
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-                            && inlineSuggestions.isNotEmpty()
-                        ) {
-                            InlineSuggestions(inlineSuggestions)
-                        } else if(quickClipState != null) {
-                            QuickClipView(quickClipState, onQuickClipDismiss)
-                        } else if (words != null) {
-                            SuggestionItems(
-                                words,
-                                onClick = {
-                                    suggestionStripListener.pickSuggestionManually(
-                                        words.getInfo(it)
-                                    )
-                                    keyboardManagerForAction?.performHapticAndAudioFeedback(
-                                        Constants.CODE_TAB,
-                                        view
-                                    )
-                                },
-                                onLongClick = {
-                                    suggestionStripListener.requestForgetWord(
-                                        words.getInfo(it)
-                                    )
-                                })
+                        if (importantNotice != null) {
+                            ImportantNoticeView(importantNotice)
                         } else {
-                            Spacer(modifier = Modifier.weight(1.0f))
-                        }
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                                && inlineSuggestions.isNotEmpty()
+                            ) {
+                                InlineSuggestions(inlineSuggestions)
+                            } else if(quickClipState != null) {
+                                QuickClipView(quickClipState, onQuickClipDismiss)
+                            } else if (words != null) {
+                                SuggestionItems(
+                                    words,
+                                    onClick = {
+                                        suggestionStripListener.pickSuggestionManually(
+                                            words.getInfo(it)
+                                        )
+                                        keyboardManagerForAction?.performHapticAndAudioFeedback(
+                                            Constants.CODE_TAB,
+                                            view
+                                        )
+                                    },
+                                    onLongClick = {
+                                        suggestionStripListener.requestForgetWord(
+                                            words.getInfo(it)
+                                        )
+                                    })
+                            } else {
+                                Spacer(modifier = Modifier.weight(1.0f))
+                            }
 
-                        if(inlineSuggestions.isEmpty()) {
-                            PinnedActionItems(onActionActivated, onActionAltActivated)
+                            if(inlineSuggestions.isEmpty()) {
+                                PinnedActionItems(onActionActivated, onActionAltActivated)
+                            }
                         }
                     }
+                }
+
+                if(incognitoMode) {
+                    IncognitoIndicator()
                 }
             }
         }
