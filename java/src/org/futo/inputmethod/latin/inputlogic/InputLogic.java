@@ -1837,7 +1837,7 @@ public final class InputLogic {
         // That's to avoid unintended additions in some sensitive fields, or fields that
         // expect to receive non-words.
         if (!settingsValues.mAutoCorrectionEnabledPerTextFieldSettings) return;
-        if (!settingsValues.isPersonalizationEnabled()) return;
+        if (!settingsValues.isLearningEnabled()) return;
         if (settingsValues.mInputAttributes.mNoLearning) return;
 
         if (mConnection.hasSlowInputConnection()) {

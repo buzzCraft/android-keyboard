@@ -75,6 +75,7 @@ public class SettingsValues {
 
     public final boolean mUseContactsDict;
     public final boolean mUsePersonalizedDicts;
+    public final boolean mIncognitoMode;
     public final boolean mUseDoubleSpacePeriod;
     public final boolean mBlockPotentiallyOffensive;
     // Use bigrams to predict the next word when there is no input for it yet
@@ -177,6 +178,7 @@ public class SettingsValues {
         mUseDictionaryKeyBoosting = prefs.getBoolean(Settings.PREF_USE_DICT_KEY_BOOSTING, true);
         mUseContactsDict = prefs.getBoolean(Settings.PREF_KEY_USE_CONTACTS_DICT, true);
         mUsePersonalizedDicts = prefs.getBoolean(Settings.PREF_KEY_USE_PERSONALIZED_DICTS, true);
+        mIncognitoMode = prefs.getBoolean(Settings.PREF_KEY_INCOGNITO_MODE, false);
         mUseDoubleSpacePeriod = prefs.getBoolean(Settings.PREF_KEY_USE_DOUBLE_SPACE_PERIOD, true)
                 && inputAttributes.mIsGeneralTextInput;
         mBlockPotentiallyOffensive = Settings.readBlockPotentiallyOffensive(prefs, res);
@@ -284,6 +286,10 @@ public class SettingsValues {
 
     public boolean isPersonalizationEnabled() {
         return mUsePersonalizedDicts;
+    }
+
+    public boolean isLearningEnabled() {
+        return mUsePersonalizedDicts && !mIncognitoMode;
     }
 
     public boolean isWordSeparator(final int code) {
@@ -451,6 +457,8 @@ public class SettingsValues {
         sb.append("" + mUseContactsDict);
         sb.append("\n   mUsePersonalizedDicts = ");
         sb.append("" + mUsePersonalizedDicts);
+        sb.append("\n   mIncognitoMode = ");
+        sb.append("" + mIncognitoMode);
         sb.append("\n   mUseDoubleSpacePeriod = ");
         sb.append("" + mUseDoubleSpacePeriod);
         sb.append("\n   mBlockPotentiallyOffensive = ");
